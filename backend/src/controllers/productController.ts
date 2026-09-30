@@ -1,19 +1,13 @@
-// =============================================================================
-// PRODUCT CONTROLLER
-// =============================================================================
-//
-// Thin controller layer. Delegates to service.
-// =============================================================================
-
-import { Request, Response } from 'express';
-import * as productService from '../services/productService';
-
+import { Request, Response } from "express";
+import * as service from "../services/productService";
+import { actor } from "../middleware/auth";
 export async function getProducts(req: Request, res: Response) {
-  const products = await productService.getAllProducts();
-  res.json({ data: products });
+  res.json(await service.getAllProducts(actor(req), req.query));
 }
-
 export async function createProduct(req: Request, res: Response) {
-  const product = await productService.createProduct(req.body);
-  res.status(201).json({ data: product });
+  const row = await service.createProduct(actor(req), req.body);
+  res
+    .location("/api/products/" + row.id)
+    .status(201)
+    .json(row);
 }

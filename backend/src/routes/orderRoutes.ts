@@ -1,32 +1,42 @@
-// =============================================================================
-// ORDER ROUTES
-// =============================================================================
-//
-// Checkout and order management.
-//
-// Critical learning area: Transactions for inventory + order creation.
-// =============================================================================
-
-import { Router } from 'express';
-import * as orderService from '../services/orderService';
-
+import { Router } from "express";
+import * as service from "../services/orderService";
+import { actor } from "../middleware/auth";
+import { asyncRoute } from "../lib/errors";
 const router = Router();
-
-// Get orders (for demo - would be user-specific)
-router.get('/', async (req, res) => {
-  const orders = await orderService.getAllOrders();
-  res.json({ data: orders });
-});
-
-// Checkout (simplified)
-router.post('/checkout', async (req, res) => {
-  try {
-    const { userId, items } = req.body; // items: [{productId, quantity}]
-    const order = await orderService.createOrder(userId, items);
-    res.status(201).json({ data: order });
-  } catch (error: any) {
-    res.status(400).json({ error: error.message || 'Checkout failed' });
-  }
-});
-
+router.get(
+  "/",
+  asyncRoute(async (req, res) =>
+    res.json(await service.getAllOrders(actor(req), req.query)),
+  ),
+);
+router.post(
+  "/checkout",
+  asyncRoute(async (req, res) => {
+    const result = await service.createOrder(actor(req), req.body);
+    res
+      .location("/api/orders/" + result.order.id)
+      .status(result.replayed ? 200 : 201)
+      .json(result);
+  }),
+);
+router.get(
+  "/:id",
+  asyncRoute(async (req, res) =>
+    res.json(await service.getOrder(actor(req), req.params.id)),
+  ),
+);
+router.patch(
+  "/:id/status",
+  asyncRoute(async (req, res) =>
+    res.json(
+      await service.transitionOrder(actor(req), req.params.id, req.body),
+    ),
+  ),
+);
+router.get(
+  "/:id/audit",
+  asyncRoute(async (req, res) =>
+    res.json({ items: await service.history(actor(req), req.params.id) }),
+  ),
+);
 export default router;

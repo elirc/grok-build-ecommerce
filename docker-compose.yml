@@ -1,18 +1,18 @@
-version: '3.8'
-
 services:
-  postgres:
+  db:
     image: postgres:16
-    container_name: grokbuildecommerce-db
-    restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: grokbuildecommerce
+      POSTGRES_USER: commerce_dev
+      POSTGRES_PASSWORD: ${COMMERCE_POSTGRES_PASSWORD:?Set a local database password}
+      POSTGRES_DB: commerce_workspace
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5440:5432"
     volumes:
-      - postgres_data_ecom:/var/lib/postgresql/data
-
+      - postgres_hr_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U commerce_dev -d commerce_workspace"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 volumes:
-  postgres_data_ecom:
+  postgres_hr_data:

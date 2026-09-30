@@ -1,3 +1,5 @@
+> Historical starter notes. Read [README](README.md) and the [learning course](astraupskill/README.md) for implemented behavior and verified limits.
+
 # SWE Thought Process Journal - grokbuildecommerceproject
 
 This journal captures the decision-making process of a senior engineer building this e-commerce platform for educational purposes.

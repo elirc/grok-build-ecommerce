@@ -1,3 +1,5 @@
+> Historical starter notes. Read [README](README.md) and the [learning course](astraupskill/README.md) for implemented behavior and verified limits.
+
 # PHASE PLANS - grokbuildecommerceproject
 
 This document outlines a progressive roadmap for building this e-commerce platform, designed specifically to develop mid-to-senior level SWE skills.

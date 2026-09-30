@@ -1,0 +1,27 @@
+
+Running 14 tests using 1 worker
+
+  ok  1 browser-tests\commerce.spec.mjs:94:1 › customer scope is reflected in the UI and tokens stay only in tab memory (3.5s)
+  ok  2 browser-tests\commerce.spec.mjs:114:1 › local registration creates a customer who can browse without admin controls (2.9s)
+  ok  3 browser-tests\commerce.spec.mjs:146:1 › administrator product CRUD keeps accepted identity and confirms deletion (4.0s)
+  ok  4 browser-tests\commerce.spec.mjs:188:1 › two product editors retain the stale draft and its captured version (7.6s)
+  ok  5 browser-tests\commerce.spec.mjs:225:1 › cart quantity editing produces an accepted server-calculated order (3.8s)
+  ok  6 browser-tests\commerce.spec.mjs:264:1 › a lost checkout response can retry the same key without another order (3.7s)
+  ok  7 browser-tests\commerce.spec.mjs:312:1 › rejected checkout preserves an exportable frozen attempt before explicit cart changes (4.0s)
+  ok  8 browser-tests\commerce.spec.mjs:345:1 › the owner cancels a pending order and sees retained history (3.9s)
+  ok  9 browser-tests\commerce.spec.mjs:377:1 › administrators advance only the explicit simulated fulfillment steps (5.1s)
+  ok 10 browser-tests\commerce.spec.mjs:397:1 › a stale cancellation cannot replace an accepted demo-payment decision (6.6s)
+  ok 11 browser-tests\commerce.spec.mjs:430:1 › product save acceptance survives a later catalogue refresh failure (3.1s)
+  ok 12 browser-tests\commerce.spec.mjs:454:1 › section navigation preserves cart and product drafts while sign-out confirms discard (4.3s)
+  ok 13 browser-tests\commerce.spec.mjs:486:1 › literal product content renders as text without executing markup (2.5s)
+  ok 14 browser-tests\commerce.spec.mjs:497:1 › desktop and narrow catalogue cart and order receipts remain readable (4.6s)
+
+  14 passed (1.3m)
+[2m[WebServer] [22m(node:7960) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:27396) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+(node:37568) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:37568) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)

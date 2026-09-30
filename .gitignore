@@ -11,3 +11,12 @@ build/
 .env*
 !.env*.example
 !.env*.sample
+
+# Local verification and credentials
+.env
+.env.*
+!.env.example
+.verification/
+test-results/
+playwright-report/
+*.tsbuildinfo

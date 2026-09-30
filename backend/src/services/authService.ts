@@ -1,66 +1,53 @@
-// =============================================================================
-// AUTH SERVICE
-// =============================================================================
-//
-// Business logic for authentication.
-//
-// Key decisions:
-// - Use bcrypt for password hashing (industry standard)
-// - JWT for stateless authentication (fits API-first apps)
-// - Separate service from routes for testability
-// =============================================================================
-
-import { prisma } from '../lib/prisma';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
-const JWT_EXPIRES_IN = '7d';
-
-interface RegisterInput {
-  email: string;
-  password: string;
-  name: string;
+import bcrypt from "bcryptjs";
+import { Prisma } from "@prisma/client";
+import { prisma } from "../lib/prisma";
+import { AppError } from "../lib/errors";
+import { loginInput, registrationInput } from "../lib/validation";
+const dummy = bcrypt.hashSync("synthetic-unused-login-password", 10);
+export async function loginUser(value: unknown) {
+  const data = loginInput.parse(value),
+    user = await prisma.user.findUnique({ where: { email: data.email } });
+  const matches = await bcrypt.compare(
+    data.password,
+    user?.passwordHash || dummy,
+  );
+  if (!user || !matches || !user.active)
+    throw new AppError(401, "Email or password was not accepted.");
+  return user.id;
 }
-
-interface LoginInput {
-  email: string;
-  password: string;
-}
-
-export async function registerUser(input: RegisterInput) {
-  const existing = await prisma.user.findUnique({ where: { email: input.email } });
-  if (existing) throw new Error('User already exists');
-
-  const passwordHash = await bcrypt.hash(input.password, 10);
-
-  const user = await prisma.user.create({
-    data: {
-      email: input.email,
-      passwordHash,
-      name: input.name,
-    },
-  });
-
-  const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-
-  return {
-    user: { id: user.id, email: user.email, name: user.name },
-    token,
-  };
-}
-
-export async function loginUser(input: LoginInput) {
-  const user = await prisma.user.findUnique({ where: { email: input.email } });
-  if (!user) throw new Error('Invalid credentials');
-
-  const valid = await bcrypt.compare(input.password, user.passwordHash);
-  if (!valid) throw new Error('Invalid credentials');
-
-  const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-
-  return {
-    user: { id: user.id, email: user.email, name: user.name },
-    token,
-  };
+export async function registerUser(value: unknown) {
+  const data = registrationInput.parse(value),
+    passwordHash = await bcrypt.hash(data.password, 10);
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email: data.email,
+          name: data.name,
+          passwordHash,
+          role: "CUSTOMER",
+        },
+      });
+      await tx.auditEvent.create({
+        data: {
+          actorId: user.id,
+          resourceType: "USER",
+          resourceId: user.id,
+          action: "REGISTER",
+          version: 1,
+        },
+      });
+      return user.id;
+    });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    )
+      throw new AppError(
+        409,
+        "An account already uses that email. Sign in instead.",
+      );
+    throw error;
+  }
 }

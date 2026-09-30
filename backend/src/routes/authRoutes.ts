@@ -1,64 +1,47 @@
-// =============================================================================
-// AUTH ROUTES
-// =============================================================================
-//
-// Handles user registration and login.
-// 
-// Mid-level focus:
-// - Use Zod for validation
-// - Thin routes — delegate to service
-// - JWT for auth (common in startups)
-// - Never return password hashes
-// =============================================================================
-
-import { Router } from 'express';
-import { z } from 'zod';
-import * as authService from '../services/authService';
-
-const router = Router();
-
-const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  name: z.string().min(2),
-});
-
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string(),
-});
-
-router.post('/register', async (req, res) => {
-  try {
-    const data = registerSchema.parse(req.body);
-    const result = await authService.registerUser(data);
-
-    res.status(201).json({
-      message: 'User registered successfully',
-      user: { id: result.user.id, email: result.user.email, name: result.user.name },
-      token: result.token,
-    });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: 'Validation failed', details: error.errors });
+import { Router } from "express";
+import { loginUser, registerUser } from "../services/authService";
+import { issueToken, currentUser } from "../middleware/auth";
+import { AppError, asyncRoute } from "../lib/errors";
+export default function authRoutes(secret: string) {
+  const router = Router(),
+    attempts = new Map<string, { count: number; until: number }>();
+  router.use((req, res, next) => {
+    const now = Date.now(),
+      key = req.ip || "local";
+    for (const [ip, entry] of attempts)
+      if (entry.until <= now) attempts.delete(ip);
+    const entry = attempts.get(key) || {
+      count: 0,
+      until: now + 15 * 60 * 1000,
+    };
+    if (entry.count >= 20 || (!attempts.has(key) && attempts.size >= 1000)) {
+      res.setHeader("Retry-After", "900");
+      return next(
+        new AppError(
+          429,
+          "Too many sign-in or registration attempts. Try again in fifteen minutes.",
+        ),
+      );
     }
-    res.status(400).json({ error: 'Registration failed' });
-  }
-});
-
-router.post('/login', async (req, res) => {
-  try {
-    const data = loginSchema.parse(req.body);
-    const result = await authService.loginUser(data);
-
-    res.json({
-      message: 'Login successful',
-      user: { id: result.user.id, email: result.user.email, name: result.user.name },
-      token: result.token,
-    });
-  } catch (error) {
-    res.status(401).json({ error: 'Invalid email or password' });
-  }
-});
-
-export default router;
+    entry.count++;
+    attempts.set(key, entry);
+    next();
+  });
+  router.post(
+    "/login",
+    asyncRoute(async (req, res) => {
+      const id = await loginUser(req.body);
+      res.json({ token: issueToken(id, secret), user: await currentUser(id) });
+    }),
+  );
+  router.post(
+    "/register",
+    asyncRoute(async (req, res) => {
+      const id = await registerUser(req.body);
+      res
+        .status(201)
+        .json({ token: issueToken(id, secret), user: await currentUser(id) });
+    }),
+  );
+  return router;
+}

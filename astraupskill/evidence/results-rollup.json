@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "mode": "verify",
+  "database": "PostgreSQL 18; helper-owned temporary loopback cluster",
+  "setupTests": 3,
+  "backendTests": 55,
+  "frontendTests": 8,
+  "browserTests": 14,
+  "build": true,
+  "total": 80
+}

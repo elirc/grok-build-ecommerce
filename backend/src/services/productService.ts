@@ -1,30 +1,32 @@
-// =============================================================================
-// PRODUCT SERVICE
-// =============================================================================
-//
-// Business logic for products.
-//
-// In real e-commerce:
-// - Inventory management
-// - Search indexing
-// - Category logic
-//
-// Here we keep it focused on core CRUD with comments on expansion points.
-// =============================================================================
-
-import { prisma } from '../lib/prisma';
-
-export async function getAllProducts() {
-  return prisma.product.findMany({
-    orderBy: { createdAt: 'desc' },
-  });
+import * as repo from "../repositories/productRepository";
+import { Actor, requireAdmin } from "../middleware/auth";
+import {
+  identity,
+  productInput,
+  productUpdate,
+  productList,
+  deleteInput,
+} from "../lib/validation";
+export const getAllProducts = (actor: Actor, query: unknown) =>
+  repo.findAll(actor, productList.parse(query));
+export const getProduct = (actor: Actor, id: unknown) =>
+  repo.find(actor, identity.parse(id));
+export function createProduct(actor: Actor, value: unknown) {
+  requireAdmin(actor);
+  return repo.create(actor, productInput.parse(value));
 }
-
-export async function createProduct(data: {
-  name: string;
-  price: number;
-  stock?: number;
-  category?: string;
-}) {
-  return prisma.product.create({ data });
+export function updateProduct(actor: Actor, id: unknown, value: unknown) {
+  requireAdmin(actor);
+  const data = productUpdate.parse(value);
+  return repo.update(actor, identity.parse(id), data.version, data.product);
 }
+export function deleteProduct(actor: Actor, id: unknown, value: unknown) {
+  requireAdmin(actor);
+  return repo.remove(
+    actor,
+    identity.parse(id),
+    deleteInput.parse(value).version,
+  );
+}
+export const history = (actor: Actor, id: unknown) =>
+  repo.history(actor, identity.parse(id));
