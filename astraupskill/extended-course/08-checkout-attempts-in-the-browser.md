@@ -1,6 +1,6 @@
 # 08. Checkout attempts in the browser
 
-[Course index](README.md) · [Worked review](answers/03-browser-commerce.md)
+[Course index](README.md) · No worked review has been written for lessons 08-11 yet; compare your answers with the cited source and tests instead.
 
 Sources: [CartPanel](../../frontend/src/features/cart/CartPanel.tsx), [application state](../../frontend/src/App.tsx), and [checkout repository](../../backend/src/repositories/orderRepository.ts). A cart describes editable shopping intent. A checkout attempt freezes that intent under a request identity so uncertainty can be resolved without accidentally asking for another purchase.
 

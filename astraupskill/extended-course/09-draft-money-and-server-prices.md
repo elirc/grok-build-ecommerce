@@ -1,6 +1,6 @@
 # 09. Draft money and server prices
 
-[Course index](README.md) · [Worked review](answers/03-browser-commerce.md)
+[Course index](README.md) · No worked review has been written for lessons 08-11 yet; compare your answers with the cited source and tests instead.
 
 Sources: [frontend value helpers](../../frontend/src/api/client.ts), [cart](../../frontend/src/features/cart/CartPanel.tsx), [validation](../../backend/src/lib/validation.ts), and [accepted checkout arithmetic](../../backend/src/repositories/orderRepository.ts). This chapter develops a precise vocabulary for estimates, accepted prices, and stored historical values.
 

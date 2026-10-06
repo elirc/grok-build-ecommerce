@@ -1,6 +1,6 @@
 # 10. Workspace lifetimes and user switches
 
-[Course index](README.md) · [Worked review](answers/03-browser-commerce.md)
+[Course index](README.md) · No worked review has been written for lessons 08-11 yet; compare your answers with the cited source and tests instead.
 
 Sources: [App](../../frontend/src/App.tsx), [useWorkspace](../../frontend/src/hooks/useWorkspace.ts), and [API client](../../frontend/src/api/client.ts). The lifetime of local work is a product behavior. A user needs to know whether changing a tab, signing out, or refreshing the page preserves a cart and an uncertain checkout attempt.
 

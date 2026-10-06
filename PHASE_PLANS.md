@@ -15,6 +15,8 @@ This document outlines a progressive roadmap for building this e-commerce platfo
 
 **Goal of this phase**: Understand the skeleton and why it's structured this way.
 
+> **Status (2026-10-06, verified against code):** Superseded. The shipped backend keeps routes and repositories but has only one controller (`backend/src/controllers/productController.ts`); order routes call `services/orderService.ts`, which delegates to `repositories/orderRepository.ts`.
+
 ---
 
 ## Phase 1: Core Domain + Authentication
@@ -43,6 +45,8 @@ This document outlines a progressive roadmap for building this e-commerce platfo
 - Protecting routes on both sides
 - Basic role-based authorization
 - How frontend state management interacts with auth
+
+> **Status (2026-10-06):** Shipped. JWT login/registration (`backend/src/routes/authRoutes.ts`, `services/authService.ts`), current-role checks per request (`middleware/auth.ts:38-65`), admin-only product CRUD with Zod contracts (`lib/validation.ts`), and a combined sign-in/register form in `frontend/src/App.tsx`. Registration cannot create an administrator.
 
 ---
 
@@ -74,6 +78,8 @@ This document outlines a progressive roadmap for building this e-commerce platfo
 - Handling partial failures in checkout
 - State management split (server state via TanStack Query vs client cart state)
 
+> **Status (2026-10-06):** Shipped with a different cart design. The cart is tab-memory React state (`frontend/src/features/cart/CartPanel.tsx`), not session- or DB-backed, and there are no optimistic updates. Checkout reserves stock at order creation inside one transaction with a durable retry key (`backend/src/repositories/orderRepository.ts:85-186`); PAID is a simulated admin transition, not a payment step.
+
 ---
 
 ## Phase 3: Advanced API Design & Data Access
@@ -101,6 +107,8 @@ This document outlines a progressive roadmap for building this e-commerce platfo
 - Performance considerations in data access
 - Handling complex query parameters cleanly
 
+> **Status (2026-10-06):** Partly shipped. Lists take `q` (literal, case-insensitive search) and `page` with a fixed page size of 20 (`backend/src/lib/validation.ts:46-66`); orders also filter by `status`, products by `active`. Centralized error handling exists (`lib/errors.ts`). Not built: sorting parameters, OpenAPI, and URL-synced filters (`react-router-dom` is listed in `frontend/package.json` but not imported anywhere).
+
 ---
 
 ## Phase 4: Testing Strategy
@@ -124,6 +132,8 @@ Build real confidence through tests.
 - Mock external dependencies properly
 - Integration tests that exercise the full stack
 
+> **Status (2026-10-06):** Shipped. 15 contract tests (`backend/src/__tests__/productService.test.ts`), 40 supertest integration tests against a helper-owned PostgreSQL cluster (`workflow.integration.test.ts`), 8 component tests, 3 setup tests, and 14 Playwright scenarios (`browser-tests/commerce.spec.mjs`). No hook tests.
+
 ---
 
 ## Phase 5: Advanced Features & Polish
@@ -142,6 +152,8 @@ Build real confidence through tests.
 - Add caching (Redis) for product listings
 - Better error messages and validation
 - Structured logging
+
+> **Status (2026-10-06):** Customer order history and admin order review/status updates shipped (`frontend/src/features/orders/pages/OrdersPage.tsx`). Variants, image uploads, reporting endpoints, background jobs, Redis caching, and domain events were not built; the only structured log is the one-line JSON for 5xx responses in `lib/errors.ts:61-68`.
 
 ---
 

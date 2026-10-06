@@ -13,9 +13,9 @@ npm run verify        # node scripts/test-database.mjs verify    (complete local
 npm run test:browser  # node scripts/test-database.mjs browser   (Playwright checkout suite)
 ```
 
-## The three 500s in the log are deliberate
+## The six 500s in the log are deliberate
 
-`evidence/backend-tests.log` contains three `"status":500,"event":"request_failed"` lines. They come from the `auditFailure` helper in `workflow.integration.test.ts`, which installs a trigger that makes the `AuditEvent` insert raise; the assertion is that registration, checkout and the third mutation *roll back* when their audit write fails, and the error handler in `backend/src/lib/errors.ts` logs any 5xx. A passing log therefore contains exactly three such lines, no more. If you want a log with none, map the injected failure to a controlled 503 ("audit unavailable") in the error handler: the rollback assertion stays the same, and the status becomes a deliberate contract instead of an unexplained 500. That is a reasonable follow-up, not a defect in the delivered run.
+`evidence/backend-tests.log` contains six `"status":500,"event":"request_failed"` lines (count them: `grep -c '"status":500' astraupskill/evidence/backend-tests.log`). They come from the `auditFailure` helper (`workflow.integration.test.ts:53-68`), which installs a trigger that makes every `AuditEvent` insert raise. Four tests use it: registration (line 132, one request), product create/update/delete (line 306, three requests), checkout (line 517, one request), and cancellation (line 638, one request). Each asserts a 500 *and* that nothing persisted. `errors.ts:61-68` logs every 5xx, so a passing run prints exactly six such lines; a seventh means something else failed. If you would rather the injected failure be a deliberate contract, map it to a controlled 503 in the error handler: the rollback assertions stay the same and only the expected status changes.
 
 ## Three different outcomes
 

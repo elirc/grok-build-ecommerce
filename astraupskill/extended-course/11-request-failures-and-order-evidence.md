@@ -1,6 +1,6 @@
 # 11. Request failures and order evidence
 
-[Course index](README.md) · [Worked review](answers/03-browser-commerce.md)
+[Course index](README.md) · No worked review has been written for lessons 08-11 yet; compare your answers with the cited source and tests instead.
 
 Sources: [request helper](../../frontend/src/api/client.ts), [workspace hook](../../frontend/src/hooks/useWorkspace.ts), [error handler](../../backend/src/lib/errors.ts), and [application middleware](../../backend/src/app.ts). A commerce interface must avoid turning an uncertain transport outcome into an incorrect statement about whether an order exists.
 

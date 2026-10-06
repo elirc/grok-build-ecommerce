@@ -23,7 +23,7 @@ After chapter 03 read [03b: break it first](03b-BREAK-IT.md).
 
 ## Prerequisites
 
-You should already be comfortable with SQL transactions (BEGIN/COMMIT, what an isolation level changes), HTTP status semantics (200 vs 201, 400 vs 409, when 404 hides existence), and React state updates from async responses. Task 3 in `05-PRACTICE.md` (a payment-provider boundary with a fake adapter) is a stretch goal, not a required step; do tasks 1, 2 and 4 first.
+You should already be comfortable with SQL transactions (BEGIN/COMMIT, what an isolation level changes), HTTP status semantics (200 vs 201, 400 vs 409, when 404 hides existence), and React state updates from async responses. Exercises 1-5 in `05-PRACTICE.md` need only Node 22; Exercises 6-8 need the PostgreSQL test helper. Exercise 9 (a payment-provider boundary with a fake adapter) is a stretch goal, not a required step.
 
 
 ## Extended course
